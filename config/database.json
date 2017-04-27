@@ -1,0 +1,25 @@
+{
+  "development": {
+    "username": "shaker",
+    "password": "yourshaker!",
+    "database": "thinkshake_base",
+    "host": "127.0.0.1",
+    "dialect": "sqlite",
+    "storage": "./development.sqlite3"
+  },
+  "test": {
+    "username": "shaker",
+    "password": "yourshaker!",
+    "database": "thinkshake_test",
+    "host": "127.0.0.1",
+    "dialect": "sqlite",
+    "storage": "./test.sqlite3"
+  },
+  "production": {
+    "username": "process.env.DB_USERNAME",
+    "password": "process.env.DB_PASSWORD",
+    "database": "thinkshake_base",
+    "host": "process.env.DB_HOSTNAME",
+    "dialect": "mysql"
+  }
+}
