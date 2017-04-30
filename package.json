@@ -11,7 +11,7 @@
     "__build": "$(npm bin)/babel ./bin/www -d dist && $(npm bin)/babel ./src -d dist/src",
     "__serve": "node dist/bin/www.js",
     "test": "$(npm bin)/mocha --compilers js:babel-register",
-    "sequelize": "$(npm bin)/sequelize --config ./config/database.json"
+    "sequelize": "$(npm bin)/sequelize --config ./config/database.json --seeders-path ./seeders"
   },
   "dependencies": {
     "body-parser": "~1.17.1",
