@@ -1,5 +1,8 @@
 FROM node:latest
 
+RUN apt-get update
+RUN apt-get install -y ocaml libelf-dev
+
 RUN useradd -d /home/shaker -m shaker && echo 'shaker ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 USER shaker
