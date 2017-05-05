@@ -1,7 +1,5 @@
 import express from 'express';
-import path from 'path';
-import fs from 'fs';
-import logger from 'morgan';
+import logger from './lib/logger';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import HttpStatus from 'http-status-codes';
@@ -13,24 +11,7 @@ const error = require('debug')('thinkshake-api:error');
 
 const app = express();
 
-// setting for logger
-const FileStreamRotator = require('file-stream-rotator');
-const accessLogStream = (() => {
-  if (process.env.REQUEST_LOG_FILE) {
-    const logDirectory = path.dirname(process.env.REQUEST_LOG_FILE);
-    fs.existsSync(logDirectory) || fs.mkdirSync(logDirectory);
-    return FileStreamRotator.getStream({
-      filename: process.env.REQUEST_LOG_FILE,
-      frequency: 'daily',
-      verbose: false
-    });
-  }
-  return process.stdout;
-})();
-app.use(logger(process.env.REQUEST_LOG_FORMAT || 'dev', {
-  stream: accessLogStream
-}));
-
+app.use(logger);
 app.use(bodyParser.json());
 app.use(expressValidator());
 app.use(bodyParser.urlencoded({ extended: false }));
