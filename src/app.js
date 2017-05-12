@@ -1,3 +1,5 @@
+/* @flow */
+
 import express from 'express';
 import logger from './lib/logger';
 import cookieParser from 'cookie-parser';
@@ -18,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // extend functions
-app.use((req, res, next) => {
+app.use((req, res, next: () => mixed) => {
   req.getBaseUrl = () => {
     return req.protocol + '://' + req.get('host') + req.baseUrl + '/';
   };
@@ -32,27 +34,27 @@ app.use('/users', users);
 app.disable('x-powered-by');
 
 // favicon response
-app.get('/favicon.ico', (req, res, next) => {
-  const err = new Error(HttpStatus.getStatusText(HttpStatus.NO_CONTENT));
+app.get('/favicon.ico', (req, res, next: () => mixed) => {
+  const err: Object = new Error(HttpStatus.getStatusText(HttpStatus.NO_CONTENT));
   err.status = HttpStatus.NO_CONTENT;
   next(err);
 });
 
 // catch 404 and forward to error handler
-app.use((req, res, next) => {
-  const err = new Error(HttpStatus.getStatusText(HttpStatus.NOT_FOUND));
+app.use((req, res, next: () => mixed) => {
+  const err: Object = new Error(HttpStatus.getStatusText(HttpStatus.NOT_FOUND));
   err.status = HttpStatus.NOT_FOUND;
   next(err);
 });
 
 // error handler
 // next has to be defined as 4 args in order to define a error handler, even unused in the function.
-app.use((err, req, res, next) => {
+app.use((err, req, res, next: () => mixed) => {
   res.status(err.status || HttpStatus.INTERNAL_SERVER_ERROR);
   error((err.status || HttpStatus.INTERNAL_SERVER_ERROR) + ' ' + (err.message || HttpStatus.getStatusText(err.status)));
 
   // TODO:エラーフォーマット
-  const errorMessages = {
+  const errorMessages: Object = {
     message: (err.message || HttpStatus.getStatusText(err.status))
   };
 

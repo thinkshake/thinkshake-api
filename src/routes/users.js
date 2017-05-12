@@ -1,10 +1,11 @@
+
 import express from 'express';
 import HttpStatus from 'http-status-codes';
 import models from '../models/';
 import util from 'util';
 
 const router = express.Router();
-router.get('/', (req, res, next) => {
+router.get('/', (req, res, next: () => mixed) => {
 
   const where = {};
   if (req.query.name) {
@@ -23,7 +24,7 @@ router.get('/', (req, res, next) => {
     });
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', (req, res, next: () => mixed) => {
 
   req.checkBody('name', 'required').notEmpty();
   req.getValidationResult().then((result) => {
@@ -54,7 +55,7 @@ router.post('/', (req, res, next) => {
 
 });
 
-router.get('/:id', (req, res, next) => {
+router.get('/:id', (req, res, next: () => mixed) => {
   models.user.get(req.params.id)
     .then((user) => {
       if (user) {
@@ -71,7 +72,7 @@ router.get('/:id', (req, res, next) => {
     });
 });
 
-const updateUser = (req, res, next) => {
+const updateUser = (req, res, next: () => mixed) => {
   // TODO: updatedAtなど共通化
   const values = { updatedAt: new Date() };
   if (req.body.name) {
@@ -92,7 +93,7 @@ const updateUser = (req, res, next) => {
 router.put('/:id', updateUser);
 router.patch('/:id', updateUser);
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', (req, res, next: () => mixed) => {
   models.user.destroy({ 'where': { 'id': req.params.id } })
     .then((status) => {
       res.status(status ? HttpStatus.NO_CONTENT : HttpStatus.BAD_REQUEST).end();

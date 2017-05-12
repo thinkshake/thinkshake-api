@@ -1,3 +1,5 @@
+/* @flow */
+
 import logger from 'morgan';
 import path from 'path';
 import fs from 'fs';

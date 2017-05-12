@@ -1,8 +1,11 @@
 /* @flow */
+const Sequelize = require('sequelize');
 
-// module.exports = function (sequelize, DataTypes) {
-export default (sequelize: Object, DataTypes: Object): Object => {
-  const User = sequelize.define('user', {
+let User;
+type UserModel = User;
+
+export default (sequelize: Sequelize, DataTypes: Sequelize.DataTypes): UserModel => {
+  User = sequelize.define('user', {
     name: DataTypes.STRING
   }, {
     comment: 'user',
