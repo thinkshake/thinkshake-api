@@ -11,18 +11,21 @@
     "__build": "$(npm bin)/babel ./bin/www -d dist && $(npm bin)/babel ./src -d dist/src",
     "__serve": "node dist/bin/www.js",
     "test": "$(npm bin)/mocha --compilers js:babel-register",
-    "sequelize": "$(npm bin)/sequelize --config ./config/database.json --seeders-path ./seeders"
+    "sequelize": "$(npm bin)/sequelize"
   },
   "dependencies": {
+    "bcrypt": "^1.0.2",
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
-    "debug": "~2.6.3",
     "express": "~4.15.2",
     "express-validator": "^3.2.0",
     "file-stream-rotator": "^0.1.0",
     "http-status-codes": "^1.1.6",
     "morgan": "~1.8.1",
     "mysql": "^2.13.0",
+    "passport": "^0.3.2",
+    "passport-http-bearer": "^1.0.1",
+    "request-promise": "^4.2.1",
     "sequelize": "^3.30.4"
   },
   "devDependencies": {
@@ -37,6 +40,7 @@
     "flow-bin": "^0.45.0",
     "mocha": "^3.3.0",
     "nodemon": "^1.11.0",
+    "power-assert": "^1.4.2",
     "sequelize-cli": "^2.7.0",
     "sqlite3": "^3.1.8"
   }

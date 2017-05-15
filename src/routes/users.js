@@ -1,70 +1,117 @@
+/* @flow */
 
 import express from 'express';
 import HttpStatus from 'http-status-codes';
 import models from '../models/';
-import util from 'util';
+import oauth from '../lib/oauth';
+import errors from '../lib/errors';
+import oauthService from '../lib/oauth-service';
 
 const router = express.Router();
-router.get('/', (req, res, next: () => mixed) => {
 
-  const where = {};
-  if (req.query.name) {
-    where.name = req.query.name;
-  }
-
-  models.user.findAll({ where: where })
-    .then((users) => {
-
-      // TODO: 出力データ絞る(日付とか不要)
-
-      res.send(users);
-    })
-    .catch((err) => {
-      next(err);
-    });
-});
+// TODO: admin
+// router.get('/', oauth.authenticate(), (req, res, next: () => mixed) => {
+//
+//   const where = {};
+//   if (req.query.name) where.name = req.query.name;
+//   if (req.query.email) where.email = req.query.email;
+//
+//   // TODO: limit
+//
+//   models.User.findAll({ where: where, attributes: ['id', 'name', 'updated_at'] })
+//     .then((users) => {
+//       res.send(users);
+//     })
+//     .catch((err) => {
+//       next(err);
+//     });
+// });
 
 router.post('/', (req, res, next: () => mixed) => {
 
   req.checkBody('name', 'required').notEmpty();
+  req.checkBody('email', 'required').notEmpty();
+  req.checkBody('password', 'required').notEmpty();
+
   req.getValidationResult().then((result) => {
     if (!result.isEmpty()) {
-
-      const err = new Error('There have been validation errors: ' + util.inspect(result.array()));
-      err.status = HttpStatus.BAD_REQUEST;
-      next(err);
-      return;
+      return next(errors.ValidationError(result.array()));
     }
 
+    // TODO: 業務エラー username/name/email 重複、passwordセキュリティ
 
-    models.user.create({
-      name: req.body.name,
+    return oauthService.registerUser(req.body.name, req.body.password)
+      .then(() => {
 
-      // TODO: 自動で日付付与
-      createdAt: new Date(),
-      updatedAt: new Date()
-    })
-      .then((user) => {
-        res.status(HttpStatus.CREATED).header('Location', req.getBaseUrl() + user.id).end();
+        return oauthService.authorize(req.body.name, req.body.password)
+          .then((parsedBody) => {
+            return models.User.createWithHash({
+              name: req.body.name,
+              email: req.body.email,
+              password: req.body.password,
+              refresh_token: parsedBody.refresh_token
+            })
+              .then(() => {
+                // .then((user) => {
+                // res.status(HttpStatus.CREATED).header('Location', req.getBaseUrl() + user.id).end();
+                res.send({ access_token: parsedBody.access_token });
+              })
+              .catch((err) => {
+                next(err);
+              });
+          })
+          .catch((err) => {
+            next(err);
+          });
+
       })
       .catch((err) => {
         next(err);
       });
-
   });
 
 });
 
-router.get('/:id', (req, res, next: () => mixed) => {
-  models.user.get(req.params.id)
+// TODO: 要test
+router.post('/:id/token/refresh', (req, res, next: () => mixed) => {
+
+  models.User.findById(req.params.id, { attributes: ['id', 'name', 'updated_at'] })
     .then((user) => {
       if (user) {
+        return oauthService.authorize(req.body.name, req.body.password, 'refresh_token')
+          .then((parsedBody) => {
 
-        // TODO: 出力データ絞る
+            return models.User.updateWithHash({
+              refresh_token: parsedBody.refresh_token
+            })
+              .then((status) => {
+                res.status(status[0] ? HttpStatus.NO_CONTENT : HttpStatus.BAD_REQUEST).end();
+              })
+              .catch((err) => {
+                next(err);
+              });
+          })
+          .catch((err) => {
+            next(err);
+          });
 
+      } else {
+        next(errors.NotFound('User not found'));
+      }
+    })
+    .catch((err) => {
+      next(err);
+    });
+
+});
+
+router.get('/:id', oauth.authenticate(), (req, res, next: () => mixed) => {
+  models.User.findById(req.params.id, { attributes: ['id', 'name', 'updated_at'] })
+    .then((user) => {
+      if (user) {
         res.send(user);
       } else {
-        next();
+        next(errors.NotFound('User not found'));
       }
     })
     .catch((err) => {
@@ -73,13 +120,15 @@ router.get('/:id', (req, res, next: () => mixed) => {
 });
 
 const updateUser = (req, res, next: () => mixed) => {
-  // TODO: updatedAtなど共通化
-  const values = { updatedAt: new Date() };
-  if (req.body.name) {
-    values.name = req.body.name;
-  }
 
-  models.user.update(values, { 'where': { 'id': req.params.id } })
+  // TODO: updatedAtなど共通化
+  const values: Object = { updatedAt: new Date() };
+  if (req.body.name) values.name = req.body.name;
+  // TODO: email 変更時は認証が必要
+  if (req.body.email) values.email = req.body.email;
+  if (req.body.password) values.password = req.body.password;
+
+  models.User.updateWithHash(values, { where: { id: req.params.id, name: req.user.username } })
     .then((status) => {
       res.status(status[0] ? HttpStatus.NO_CONTENT : HttpStatus.BAD_REQUEST).end();
     })
@@ -90,11 +139,11 @@ const updateUser = (req, res, next: () => mixed) => {
 };
 
 // Should it be slightly different between put and patch?
-router.put('/:id', updateUser);
-router.patch('/:id', updateUser);
+router.put('/:id', oauth.authenticate(), updateUser);
+router.patch('/:id', oauth.authenticate(), updateUser);
 
-router.delete('/:id', (req, res, next: () => mixed) => {
-  models.user.destroy({ 'where': { 'id': req.params.id } })
+router.delete('/:id', oauth.authenticate(), (req, res, next: () => mixed) => {
+  models.User.destroy({ where: { id: req.params.id, name: req.user.username } })
     .then((status) => {
       res.status(status ? HttpStatus.NO_CONTENT : HttpStatus.BAD_REQUEST).end();
     })

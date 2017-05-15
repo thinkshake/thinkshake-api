@@ -22,7 +22,7 @@ This is the api for ThinkShake.
 #### Database Migration
 ```NODE_ENV=development npm run sequelize db:migrate```
 
-```NODE_ENV=development npm run sequelize --seeders-path ./seeders db:seed:all```
+```NODE_ENV=development npm run sequelize db:seed:all```
 
 #### Start dev server to develop
 ```npm run debug```
@@ -37,7 +37,7 @@ This is the api for ThinkShake.
 ```docker build -t thinkshake/api .```
 
 #### Run container
-```docker run --name thinkshake-api -d -itv $(pwd):/srv/thinkshake-api -p 5000:5000 thinkshake/api /bin/bash```
+```docker run --name thinkshake-api -d -itv $(pwd):/srv/thinkshake-api -p 5000:5000 thinkshake/api```
 
 **Please make sure that your dev path is shared in Docker**
 
