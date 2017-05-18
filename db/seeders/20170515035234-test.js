@@ -7,6 +7,7 @@ module.exports = {
       name: 'shaker_test',
       email: 'test@thinkshake.net',
       password: 'test',
+      access_token: 'access_token',
       refresh_token: 'refresh_token'
     }).then((user) => {
       return models.Topic.create({
@@ -21,6 +22,7 @@ module.exports = {
           }),
           models.Project.create({
             name: 'テストプロジェクト',
+            goal: 'テストゴール',
             topic_id: topic.id,
             owner_id: user.id
           }).then((project) => {

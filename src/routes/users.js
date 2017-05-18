@@ -6,6 +6,7 @@ import models from '../models/';
 import errors from '../lib/errors';
 import oauthService from '../lib/oauth-service';
 
+const exposeAttributes = ['id', 'name', 'updated_at'];
 const router = express.Router();
 
 // TODO: admin
@@ -17,7 +18,7 @@ const router = express.Router();
 //
 //   // TODO: limit
 //
-//   models.User.findAll({ where: where, attributes: ['id', 'name', 'updated_at'] })
+//   models.User.findAll({ where: where, attributes: exposeAttributes })
 //     .then((users) => {
 //       res.send(users);
 //     })
@@ -48,6 +49,7 @@ router.post('/', (req, res, next: () => mixed) => {
               name: req.body.name,
               email: req.body.email,
               password: req.body.password,
+              access_token: parsedBody.access_token,
               refresh_token: parsedBody.refresh_token
             })
               .then(() => {
@@ -71,41 +73,8 @@ router.post('/', (req, res, next: () => mixed) => {
 
 });
 
-// TODO: 要test
-router.post('/:id/token/refresh', (req, res, next: () => mixed) => {
-
-  models.User.findById(req.params.id, { attributes: ['id', 'name', 'updated_at'] })
-    .then((user) => {
-      if (user) {
-        return oauthService.authorize(req.body.name, req.body.password, 'refresh_token')
-          .then((parsedBody) => {
-
-            return models.User.updateWithHash({
-              refresh_token: parsedBody.refresh_token
-            })
-              .then((status) => {
-                res.status(status[0] ? HttpStatus.NO_CONTENT : HttpStatus.BAD_REQUEST).end();
-              })
-              .catch((err) => {
-                next(err);
-              });
-          })
-          .catch((err) => {
-            next(err);
-          });
-
-      } else {
-        next(errors.NotFound('User not found'));
-      }
-    })
-    .catch((err) => {
-      next(err);
-    });
-
-});
-
 router.get('/:id', (req, res, next: () => mixed) => {
-  models.User.findById(req.params.id, { attributes: ['id', 'name', 'updated_at'] })
+  models.User.findById(req.params.id, { attributes: exposeAttributes })
     .then((user) => {
       if (user) {
         res.send(user);

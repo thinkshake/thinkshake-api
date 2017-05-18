@@ -5,6 +5,7 @@ import HttpStatus from 'http-status-codes';
 import models from '../models/';
 import errors from '../lib/errors';
 
+const exposeAttributes = ['id', 'ratee_id', 'rater_id', 'type', 'point', 'updated_at'];
 const router = express.Router();
 router.get('/', (req, res, next: () => mixed) => {
 
@@ -14,7 +15,7 @@ router.get('/', (req, res, next: () => mixed) => {
 
   models.Rate.findAll(Object.assign({
     where: where,
-    attributes: ['id', 'ratee_id', 'rater_id', 'type', 'point', 'updated_at'],
+    attributes: exposeAttributes,
   }, req.getQeuryCommon()))
     .then((rates) => {
       res.send(rates);
@@ -59,7 +60,7 @@ router.post('/', (req, res, next: () => mixed) => {
 });
 
 router.get('/:id', (req, res, next: () => mixed) => {
-  models.Rate.findById(req.params.id, { attributes: ['id', 'ratee_id', 'rater_id', 'type', 'point', 'updated_at'] })
+  models.Rate.findById(req.params.id, { attributes: exposeAttributes })
     .then((rate) => {
       if (rate) {
         res.send(rate);

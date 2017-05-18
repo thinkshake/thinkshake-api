@@ -22,7 +22,8 @@ app.use(expressValidator());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(oauthAddon([
   { path: new RegExp('^/healthcheck$'), method: 'GET' },
-  { path: new RegExp('^/users/\\d/token/refresh$'), method: 'POST' },
+  { path: new RegExp('^/login$'), method: 'POST' },
+  // { path: new RegExp('^/users/\\d/token/refresh$'), method: 'POST' },
   { path: new RegExp('^/users$'), method: 'POST' }]));
 app.use(utilitiesAddon);
 
@@ -32,7 +33,7 @@ app.use('/topics', routes.topics);
 app.use('/projects', routes.projects);
 app.use('/opinions', routes.opinions);
 app.use('/rates', routes.rates);
-app.use('/healthcheck', routes.healthcheck);
+app.use('/', routes.root);
 
 // secure headers
 app.disable('x-powered-by');

@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     email: DataTypes.STRING,
     password: DataTypes.STRING,
     salt: DataTypes.STRING,
+    access_token: DataTypes.STRING,
     refresh_token: DataTypes.STRING
   }, Object.assign({
     comment: 'user',
@@ -28,6 +29,16 @@ module.exports = (sequelize, DataTypes) => {
       //     { where: { id: id } }
       //   );
       // }
+
+      login: (email, password) => {
+        return User.findOne({ where: { email: email }, attributes: ['name', 'password', 'salt'] })
+          .then((user) => {
+            if (user && user.password === sha512(password, user.salt)) {
+              return user;
+            }
+            return null;
+          });
+      },
 
       createWithHash: (values, options) => {
         values.salt = genRandomString(16);

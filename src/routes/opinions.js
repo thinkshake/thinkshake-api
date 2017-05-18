@@ -5,6 +5,7 @@ import HttpStatus from 'http-status-codes';
 import models from '../models/';
 import errors from '../lib/errors';
 
+const exposeAttributes = ['id', 'remark', 'updated_at'];
 const router = express.Router();
 router.get('/', (req, res, next: () => mixed) => {
 
@@ -15,7 +16,7 @@ router.get('/', (req, res, next: () => mixed) => {
 
   models.Opinion.findAll(Object.assign({
     where: where,
-    attributes: ['id', 'remark', 'updated_at'],
+    attributes: exposeAttributes,
   }, req.getQeuryCommon()))
     .then((opinions) => {
       res.send(opinions);

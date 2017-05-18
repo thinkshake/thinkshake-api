@@ -12,6 +12,10 @@ module.exports = {
         allowNull: false,
         type: Sequelize.STRING
       },
+      goal: {
+        allowNull: false,
+        type: Sequelize.STRING
+      },
       topic_id: {
         allowNull: false,
         type: Sequelize.INTEGER,

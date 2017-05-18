@@ -5,6 +5,7 @@ import models from '../models/';
 import opinionsRoute from './opinions';
 import errors from '../lib/errors';
 
+const exposeAttributes = ['id', 'name', 'updated_at'];
 const router = express.Router();
 router.get('/', (req, res, next: () => mixed) => {
 
@@ -13,7 +14,7 @@ router.get('/', (req, res, next: () => mixed) => {
 
   models.Topic.findAll(Object.assign({
     where: where,
-    attributes: ['id', 'name', 'updated_at'],
+    attributes: exposeAttributes,
   }, req.getQeuryCommon()))
     .then((topics) => {
       res.send(topics);
@@ -24,7 +25,7 @@ router.get('/', (req, res, next: () => mixed) => {
 });
 
 router.get('/:id', (req, res, next: () => mixed) => {
-  models.Topic.findById(req.params.id, { attributes: ['id', 'name', 'updated_at'] })
+  models.Topic.findById(req.params.id, { attributes: exposeAttributes })
     .then((topic) => {
       if (topic) {
         res.send(topic);

@@ -8,6 +8,7 @@ module.exports = {
         name: 'shaker_master',
         email: 'admin@thinkshake.net',
         password: 'test',
+        access_token: 'access_token',
         refresh_token: 'refresh_token'
       }),
       models.Topic.create({ name: '社会'}),

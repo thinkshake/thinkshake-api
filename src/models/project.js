@@ -3,6 +3,7 @@ const config = require('./config');
 module.exports = function(sequelize, DataTypes) {
   var Project = sequelize.define('Project', {
     name: DataTypes.STRING,
+    goal: DataTypes.STRING,
     topic_id: DataTypes.INTEGER,
     owner_id: DataTypes.INTEGER
   }, Object.assign({
