@@ -3,11 +3,10 @@
 import express from 'express';
 import HttpStatus from 'http-status-codes';
 import models from '../models/';
-import oauth from '../lib/oauth';
 import errors from '../lib/errors';
 
 const router = express.Router();
-router.get('/', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.get('/', (req, res, next: () => mixed) => {
 
   const where = {};
   if (req.query.project_id) where.project_id = req.query.project_id;
@@ -27,7 +26,7 @@ router.get('/', oauth.authenticate(), (req, res, next: () => mixed) => {
 });
 
 const provider = (router: express.Router, related_id: string) => {
-  router.post('/:related_id/opinions/', oauth.authenticate(), (req, res, next: () => mixed) => {
+  router.post('/:related_id/opinions/', (req, res, next: () => mixed) => {
 
     req.checkBody('remark', 'required').notEmpty();
     req.getValidationResult().then((result) => {
@@ -60,7 +59,7 @@ const provider = (router: express.Router, related_id: string) => {
     });
   });
 
-  router.delete('/:related_id/opinions/:id', oauth.authenticate(), (req, res, next: () => mixed) => {
+  router.delete('/:related_id/opinions/:id', (req, res, next: () => mixed) => {
     const options = { where: { id: req.params.id, user_id: 1 /* TODO:ユーザーを取得する */ } };
     options.where[related_id] = req.params.related_id;
 

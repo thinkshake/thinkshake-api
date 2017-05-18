@@ -3,5 +3,6 @@ import topics from './topics';
 import projects from './projects';
 import opinions from './opinions';
 import rates from './rates';
+import healthcheck from './healthcheck';
 
-export default { users, topics, projects, opinions: opinions.router, rates };
+export default { users, topics, projects, opinions: opinions.router, rates, healthcheck };

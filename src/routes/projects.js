@@ -4,11 +4,10 @@ import express from 'express';
 import HttpStatus from 'http-status-codes';
 import models from '../models/';
 import opinionsRoute from './opinions';
-import oauth from '../lib/oauth';
 import errors from '../lib/errors';
 
 const router = express.Router();
-router.get('/', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.get('/', (req, res, next: () => mixed) => {
 
   const where = {};
   if (req.query.name) where.name = req.query.name;
@@ -27,7 +26,7 @@ router.get('/', oauth.authenticate(), (req, res, next: () => mixed) => {
     });
 });
 
-router.post('/', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.post('/', (req, res, next: () => mixed) => {
 
   req.checkBody('name', 'required').notEmpty();
   req.checkBody('topic_id', 'required').notEmpty();
@@ -59,7 +58,7 @@ router.post('/', oauth.authenticate(), (req, res, next: () => mixed) => {
 
 });
 
-router.get('/:id', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.get('/:id', (req, res, next: () => mixed) => {
   models.Project.findById(req.params.id, { attributes: ['id', 'name', 'updated_at'] })
     .then((project) => {
       if (project) {
@@ -96,10 +95,10 @@ const updateProject = (req, res, next: () => mixed) => {
 };
 
 // Should it be slightly different between put and patch?
-router.put('/:id', oauth.authenticate(), updateProject);
-router.patch('/:id', oauth.authenticate(), updateProject);
+router.put('/:id', updateProject);
+router.patch('/:id', updateProject);
 
-router.delete('/:id', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.delete('/:id', (req, res, next: () => mixed) => {
 
   models.User.findOne({ where: { name: req.user.username } })
     .then((user) => {
@@ -123,7 +122,7 @@ opinionsRoute.provider(router, 'project_id');
 
 // =====================
 // Participant
-router.post('/:project_id/participants/', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.post('/:project_id/participants/', (req, res, next: () => mixed) => {
 
   models.User.findOne({ where: { name: req.user.username } })
     .then((user) => {
@@ -143,7 +142,7 @@ router.post('/:project_id/participants/', oauth.authenticate(), (req, res, next:
     });
 
 });
-router.delete('/:project_id/participants/:id', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.delete('/:project_id/participants/:id', (req, res, next: () => mixed) => {
 
   models.User.findOne({ where: { name: req.user.username } })
     .then((user) => {

@@ -37,7 +37,7 @@ class OAuthService {
           })
           .catch((err) => {
 
-          // FIXME: oauth2-serverが変更されたら変更する必要がある
+            // FIXME: oauth2-serverが変更されたら変更する必要がある
             // err.error
             // { message: 'The access token provided is invalid.',
             //   error:
@@ -48,7 +48,7 @@ class OAuthService {
             //       error: 'invalid_token',
             //     error_description: 'The access token provided is invalid.' } }
 
-            const error = new Error(err.error.error.message);
+            const error: Object = new Error(err.error.error.message);
             error.status = err.error.error.code;
             done(error);
           });

@@ -2,10 +2,11 @@
 
 import express from 'express';
 import logger from './lib/logger';
-import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import HttpStatus from 'http-status-codes';
 import expressValidator from 'express-validator';
+import utilitiesAddon from './lib/utilities-addon';
+import oauthAddon from './lib/oauth-addon';
 import routes from './routes';
 
 // const log = require('debug')('thinkshake-api:server');
@@ -18,35 +19,12 @@ app.set('env', process.env.NODE_ENV || 'development');
 app.use(logger);
 app.use(bodyParser.json());
 app.use(expressValidator());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-
-// extend functions
-app.use((req, res, next: () => mixed) => {
-  req.getBaseUrl = () => {
-    return req.protocol + '://' + req.get('host') + req.baseUrl + '/';
-  };
-  req.getQueryCommon = () => {
-    const order = req.query.order ? req.query.order : '';
-    let orderSort = 'ASC';
-    const orders = order.split(',').map((orderColumn) => {
-      if (orderColumn[0] === '-') {
-        orderColumn = orderColumn.substring(1);
-        orderSort = 'DESC';
-        return [orderColumn.substring(1), 'DESC'];
-      } else if (orderColumn[0] === '+') {
-        orderColumn = orderColumn.substring(1);
-      }
-      return [orderColumn, orderSort];
-    });
-    return {
-      limit: isNaN(Number(req.query.limit)) ? 10 : Number(req.query.limit),
-      offset: isNaN(Number(req.query.offset)) ? 0 : Number(req.query.offset),
-      order: orders
-    };
-  };
-  return next();
-});
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(oauthAddon([
+  { path: new RegExp('^/healthcheck$'), method: 'GET' },
+  { path: new RegExp('^/users/\\d/token/refresh$'), method: 'POST' },
+  { path: new RegExp('^/users$'), method: 'POST' }]));
+app.use(utilitiesAddon);
 
 // routes
 app.use('/users', routes.users);
@@ -54,6 +32,7 @@ app.use('/topics', routes.topics);
 app.use('/projects', routes.projects);
 app.use('/opinions', routes.opinions);
 app.use('/rates', routes.rates);
+app.use('/healthcheck', routes.healthcheck);
 
 // secure headers
 app.disable('x-powered-by');

@@ -3,11 +3,10 @@
 import express from 'express';
 import models from '../models/';
 import opinionsRoute from './opinions';
-import oauth from '../lib/oauth';
 import errors from '../lib/errors';
 
 const router = express.Router();
-router.get('/', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.get('/', (req, res, next: () => mixed) => {
 
   const where = {};
   if (req.query.name) where.name = req.query.name;
@@ -24,7 +23,7 @@ router.get('/', oauth.authenticate(), (req, res, next: () => mixed) => {
     });
 });
 
-router.get('/:id', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.get('/:id', (req, res, next: () => mixed) => {
   models.Topic.findById(req.params.id, { attributes: ['id', 'name', 'updated_at'] })
     .then((topic) => {
       if (topic) {

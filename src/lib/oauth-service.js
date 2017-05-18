@@ -3,6 +3,8 @@
 import appConfig from '../../config/app';
 import rp from 'request-promise';
 
+type GrantType = 'password' | 'refresh_token';
+
 class OAuthService {
   options = {};
 
@@ -12,11 +14,11 @@ class OAuthService {
     };
   }
 
-  _getApiName(apiName) {
+  _getApiName(apiName: string) {
     return appConfig['oauth-endpoint'] + (apiName ? apiName : '');
   }
 
-  registerUser(username, password) {
+  registerUser(username: string, password: string) {
     const opts = Object.assign({}, this.options);
     opts.uri = this._getApiName('/users');
     opts.method = 'POST';
@@ -28,7 +30,7 @@ class OAuthService {
     return rp(opts);
   }
 
-  authorize(username, password, grantType) {
+  authorize(username: string, password: string, grantType: ?GrantType) {
     const opts = Object.assign({}, this.options);
     opts.uri = this._getApiName('/oauth/token');
     opts.method = 'POST';
@@ -48,7 +50,7 @@ class OAuthService {
     return rp(opts);
   }
 
-  authenticateMe(token) {
+  authenticateMe(token: string) {
     const opts = Object.assign({}, this.options);
     opts.uri = this._getApiName('/oauth/me');
     opts.headers = {
@@ -58,7 +60,7 @@ class OAuthService {
     return rp(opts);
   }
 
-  authenticateById(username, token) {
+  authenticateById(username: string, token: string) {
     const opts = Object.assign({}, this.options);
     opts.uri = this._getApiName(`/users/${username}`);
     opts.headers = {

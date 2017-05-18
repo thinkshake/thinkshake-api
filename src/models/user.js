@@ -39,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
         return User.findById(options.where.id, { rejectOnEmpty: true })
           .then((user) => {
             if (values.password) values.password = sha512(values.password, user.salt);
-            return update(values, options);
+            return User.update(values, options);
           });
       }
     }

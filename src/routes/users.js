@@ -3,14 +3,13 @@
 import express from 'express';
 import HttpStatus from 'http-status-codes';
 import models from '../models/';
-import oauth from '../lib/oauth';
 import errors from '../lib/errors';
 import oauthService from '../lib/oauth-service';
 
 const router = express.Router();
 
 // TODO: admin
-// router.get('/', oauth.authenticate(), (req, res, next: () => mixed) => {
+// router.get('/', (req, res, next: () => mixed) => {
 //
 //   const where = {};
 //   if (req.query.name) where.name = req.query.name;
@@ -105,7 +104,7 @@ router.post('/:id/token/refresh', (req, res, next: () => mixed) => {
 
 });
 
-router.get('/:id', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.get('/:id', (req, res, next: () => mixed) => {
   models.User.findById(req.params.id, { attributes: ['id', 'name', 'updated_at'] })
     .then((user) => {
       if (user) {
@@ -139,10 +138,10 @@ const updateUser = (req, res, next: () => mixed) => {
 };
 
 // Should it be slightly different between put and patch?
-router.put('/:id', oauth.authenticate(), updateUser);
-router.patch('/:id', oauth.authenticate(), updateUser);
+router.put('/:id', updateUser);
+router.patch('/:id', updateUser);
 
-router.delete('/:id', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.delete('/:id', (req, res, next: () => mixed) => {
   models.User.destroy({ where: { id: req.params.id, name: req.user.username } })
     .then((status) => {
       res.status(status ? HttpStatus.NO_CONTENT : HttpStatus.BAD_REQUEST).end();

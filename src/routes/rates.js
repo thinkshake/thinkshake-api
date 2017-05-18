@@ -3,11 +3,10 @@
 import express from 'express';
 import HttpStatus from 'http-status-codes';
 import models from '../models/';
-import oauth from '../lib/oauth';
 import errors from '../lib/errors';
 
 const router = express.Router();
-router.get('/', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.get('/', (req, res, next: () => mixed) => {
 
   const where = {};
   if (req.query.ratee_id) where.ratee_id = req.query.ratee_id;
@@ -25,7 +24,7 @@ router.get('/', oauth.authenticate(), (req, res, next: () => mixed) => {
     });
 });
 
-router.post('/', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.post('/', (req, res, next: () => mixed) => {
 
   req.checkBody('ratee_id', 'required').notEmpty();
   req.checkBody('type', 'required').notEmpty();
@@ -59,7 +58,7 @@ router.post('/', oauth.authenticate(), (req, res, next: () => mixed) => {
 
 });
 
-router.get('/:id', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.get('/:id', (req, res, next: () => mixed) => {
   models.Rate.findById(req.params.id, { attributes: ['id', 'ratee_id', 'rater_id', 'type', 'point', 'updated_at'] })
     .then((rate) => {
       if (rate) {
@@ -73,7 +72,7 @@ router.get('/:id', oauth.authenticate(), (req, res, next: () => mixed) => {
     });
 });
 
-router.delete('/:id', oauth.authenticate(), (req, res, next: () => mixed) => {
+router.delete('/:id', (req, res, next: () => mixed) => {
 
   models.User.findOne({ where: { name: req.user.username } })
     .then((user) => {
